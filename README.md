@@ -1,2 +1,2 @@
 # Web-based-Appointment-System-with-Inquiry-for-Minell-s-Hair-Nail-and-Lashes-Salon
-Final revision of our IT Capstone 2 project – a full-stack web application with admin panel using HTML, CSS, JavaScript, Bootstrap, PHP, and MySQL
+This repository contains the final revised version of our BSIT Capstone 2 project. It is a full-stack web application developed with HTML, CSS, JavaScript, Bootstrap for the frontend, and PHP with MySQL for the backend. The project features a complete admin panel, authentication system, and dynamic database integration.
