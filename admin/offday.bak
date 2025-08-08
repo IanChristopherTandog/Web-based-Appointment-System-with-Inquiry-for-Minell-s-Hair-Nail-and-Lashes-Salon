@@ -1,0 +1,192 @@
+<?php  
+session_start();
+error_reporting(0);
+ini_set('display_errors', 1);
+include('partials/dbconnection.php');
+
+if (strlen($_SESSION['salondbaid']) == 0) {
+    header('location:login.php');
+    exit;
+}
+
+// Initialize messages
+$message = "";
+$message_type = ""; // "success" or "error"
+
+// Handle the maintenance mode toggle request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['status'])) {
+    $status = intval($_POST['status']);
+
+    $query = $con->prepare("UPDATE tblsettings SET maintenance_mode = ?");
+    if ($query === false) {
+        die("MySQL prepare statement error: " . $con->error);
+    }
+
+    $query->bind_param("i", $status);
+    if (!$query->execute()) {
+        $message = "Error updating maintenance mode.";
+        $message_type = "error";
+    }
+    $query->close();
+    exit;
+}
+
+// Handle day off insertion
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
+    $title = trim($_POST['title']);
+    $start_date = $_POST['start_date'];
+    $end_date = $_POST['end_date'];
+
+    if (empty($title) || empty($start_date) || empty($end_date)) {
+        $message = "All fields are required.";
+        $message_type = "error";
+    } else {
+        $query = $con->prepare("INSERT INTO tbldayoffs (title, start_date, end_date) VALUES (?, ?, ?)");
+        if ($query === false) {
+            $message = "MySQL prepare statement error: " . $con->error;
+            $message_type = "error";
+        } else {
+            $query->bind_param("sss", $title, $start_date, $end_date);
+            if (!$query->execute()) {
+                $message = "MySQL execution error: " . $query->error;
+                $message_type = "error";
+            } else {
+                $message = "Day off added successfully!";
+                $message_type = "success";
+            }
+            $query->close();
+        }
+    }
+}
+
+// Fetch the current maintenance mode status
+$query = $con->prepare("SELECT maintenance_mode FROM tblsettings LIMIT 1");
+$query->execute();
+$query->bind_result($maintenance_mode);
+$query->fetch();
+$query->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Minell's Admin - CMS</title>
+    <link rel="stylesheet" href="vendors/feather/feather.css">
+    <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="vendors/select2/select2.min.css">
+    <link rel="stylesheet" href="vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
+    <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+    <link rel="shortcut icon" href="images/favicon.png" />
+</head>
+<body>
+    <div class="container-scroller">
+        <?php include_once('partials/_navbar.php'); ?>
+
+        <div class="container-fluid page-body-wrapper">
+            <?php include_once('partials/_sidebar.php'); ?>
+
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-12 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="maintenanceSwitch">Maintenance Mode</label>
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="maintenanceSwitch" 
+                                                <?php echo ($maintenance_mode == 1) ? 'checked' : ''; ?>>
+                                            <label class="custom-control-label" for="maintenanceSwitch"></label>
+                                        </div>
+                                    </div>
+                                </div>                              
+                            </div>
+                        </div>
+                        <!-- Day Off Form -->
+                        <div class="col-12 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                <h4>Add Day Off</h4>
+                                    <form action="" method="POST">
+                                        <div class="form-group">
+                                            <label for="title">Title:</label>
+                                            <input type="text" class="form-control" id="title" name="title" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="start_date">Start Date:</label>
+                                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="end_date">End Date:</label>
+                                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <?php include_once('partials/_footer.php'); ?>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for Messages -->
+    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="messageModalLabel">Message</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <?php
+                    if ($message) {
+                        echo "<div class='alert alert-" . ($message_type == "success" ? "success" : "danger") . "'>$message</div>";
+                    }
+                    ?>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="vendors/select2/select2.min.js"></script>
+    <script src="js/off-canvas.js"></script>
+    <script src="js/hoverable-collapse.js"></script>
+    <script src="js/template.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/todolist.js"></script>
+
+    <script>
+    document.getElementById('maintenanceSwitch').addEventListener('change', function () {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '', true); // Send the request to the current file
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                console.log("Response: " + xhr.responseText);
+            }
+        };
+        xhr.send('status=' + (this.checked ? 1 : 0));
+    });
+
+    // Show modal on page load if there's a message
+    $(document).ready(function() {
+        <?php if ($message) : ?>
+            $('#messageModal').modal('show');
+        <?php endif; ?>
+    });
+    </script>
+    <?php include_once('partials/logout.php');?>
+</body>
+</html>

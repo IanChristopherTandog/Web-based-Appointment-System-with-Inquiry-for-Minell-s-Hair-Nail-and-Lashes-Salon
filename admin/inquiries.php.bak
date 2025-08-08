@@ -1,0 +1,121 @@
+<?php
+session_start();
+error_reporting(0);
+include('partials/dbconnection.php');
+
+// Redirect if not logged in
+if (strlen($_SESSION['salondbaid']) == 0) {
+    header('location:login.php');
+} else {
+    // Fetch inquiries from the database
+    $inquiriesQuery = mysqli_query($con, "SELECT * FROM tblinquiry ORDER BY submit_date DESC");
+
+    // Handle the reply form submission
+    if (isset($_POST['submitReply'])) {
+        $inquiryId = $_POST['inquiryId']; // Get the inquiry ID from the form
+        $reply = mysqli_real_escape_string($con, $_POST['reply']); // Sanitize input
+        
+        // Insert the reply into the database
+        $replyQuery = mysqli_query($con, "INSERT INTO tblreplies (inquiry_id, reply_text, reply_by, reply_date) VALUES ('$inquiryId', '$reply', 'ADMIN', NOW())");
+
+        if ($replyQuery) {
+            echo "<script>alert('Reply has been submitted.');</script>";
+            echo "<script>window.location.href = 'inquiries.php'</script>";
+        } else {
+            echo "<script>alert('Something went wrong. Error: " . mysqli_error($con) . "');</script>";
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Client Inquiries</title>
+    <link rel="stylesheet" href="vendors/feather/feather.css">
+    <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+    <link rel="shortcut icon" href="images/favicon.png" />
+    <link rel="stylesheet" href="vendors/datatables.net-bs4/dataTables.bootstrap4.css">
+</head>
+<body>
+<div class="container-scroller">
+    <?php include_once('partials/_navbar.php'); ?>
+    <div class="container-fluid page-body-wrapper">
+        
+        <?php include_once('partials/_sidebar.php'); ?>
+
+        <div class="main-panel">
+            <div class="content-wrapper">
+
+                <!-- Inquiries Inbox -->
+                <div class="card mt-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4>Client Inquiries</h4>
+                    </div>
+                    <div class="card-body">
+                        <?php while ($inquiryRow = mysqli_fetch_assoc($inquiriesQuery)) { ?>
+                            <div class="card mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong><?php echo $inquiryRow['name']; ?></strong>
+                                        <span class="text-muted">(<?php echo $inquiryRow['email']; ?>)</span>
+                                    </div>
+                                    <small class="text-muted"><?php echo date("F j, Y, g:i a", strtotime($inquiryRow['submit_date'])); ?></small>
+                                </div>
+                                <div class="card-body">
+                                    <h5><?php echo $inquiryRow['subject']; ?></h5>
+                                    <p><?php echo $inquiryRow['message']; ?></p>
+                                </div>
+                                <div class="card-footer d-flex justify-content-between">
+                                    <!-- Reply Button -->
+                                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#replyForm<?php echo $inquiryRow['ID']; ?>" aria-expanded="false" aria-controls="replyForm<?php echo $inquiryRow['ID']; ?>">Reply</button>
+                                </div>
+                                <!-- Reply Form Collapse -->
+                                <div class="collapse" id="replyForm<?php echo $inquiryRow['ID']; ?>">
+                                    <div class="card-body">
+                                        <form method="POST" action="inquiries.php">
+                                            <input type="hidden" name="inquiryId" value="<?php echo $inquiryRow['ID']; ?>">
+                                            <div class="form-group">
+                                                <label for="reply">Reply</label>
+                                                <textarea class="form-control" id="reply" name="reply" rows="3" required></textarea>
+                                            </div>
+                                            <button type="submit" name="submitReply" class="btn btn-primary">Submit Reply</button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Display Replies -->
+                                <?php
+                                $repliesQuery = mysqli_query($con, "SELECT * FROM tblreplies WHERE inquiry_id = '{$inquiryRow['ID']}' ORDER BY reply_date DESC");
+                                if (mysqli_num_rows($repliesQuery) > 0) {
+                                    while ($replyRow = mysqli_fetch_assoc($repliesQuery)) {
+                                ?>
+                                    <div class="card mt-2">
+                                        <div class="card-body">
+                                            <strong>Reply By:</strong> <?php echo $replyRow['reply_by']; ?><br>
+                                            <strong>Reply:</strong> <?php echo $replyRow['reply_text']; ?><br>
+                                            <small><em><?php echo date("F j, Y, g:i a", strtotime($replyRow['reply_date'])); ?></em></small>
+                                        </div>
+                                    </div>
+                                <?php } } ?>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+                <!-- End Inquiries Inbox -->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Required scripts -->
+<script src="vendors/js/vendor.bundle.base.js"></script>
+<script src="js/vertical-layout-light.js"></script>
+<script src="https://cdn.datatables.net/2.1.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.7/js/dataTables.bootstrap5.min.js"></script>
+</body>
+</html>

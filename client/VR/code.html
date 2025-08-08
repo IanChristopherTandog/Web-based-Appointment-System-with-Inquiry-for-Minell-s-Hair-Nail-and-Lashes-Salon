@@ -1,0 +1,408 @@
+<html>
+<head>
+    <title>Hair Style Selector</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: lightgray;
+        }
+        .container {
+            display: flex;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        .image-container {
+            position: relative;
+        }
+        .image-container img {
+            width: 400px;
+            height: auto;
+            border-radius: 10px;
+        }
+        .try-on-button {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff007f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .popup .styles {
+            display: flex;
+            justify-content: space-around;
+        }
+        .popup .style-item {
+            width: 150px;
+            text-align: center;
+            margin: 10px;
+        }
+        .popup .style-item img {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .popup .style-item img.selected {
+            border: 2px solid #ff007f;
+        }
+        .popup .style-item p {
+            margin: 5px 0 0 0;
+            font-size: 16px;
+        }
+        .popup-close {
+            background-color: #ff007f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .style-selector {
+            margin-left: 20px;
+        }
+        .style-selector h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .styles {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .style-item {
+            margin: 5px;
+            text-align: center;
+        }
+        .style-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        .style-item img.selected {
+            border-color: #ff007f;
+        }
+        .style-item p {
+            margin: 5px 0 0;
+            font-size: 14px;
+        }
+        .color-selector {
+            margin-top: 20px;
+        }
+        .color-selector h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .colors {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .color-item {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 10 5px;
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+        .color-item.selected {
+            border-color: #ff007f;
+        }
+    </style>
+
+
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img id="main-image" alt="Person with Bobcut 1 hairstyle" src="page.png" />
+            <button class="try-on-button" onclick="openPopup()">TRY ON</button>
+        </div>
+        <div class="style-selector">
+            <h2>STYLE</h2>
+            <div class="styles">
+                <div class="style-item">
+                    <img alt="Bobcut 1" class="selected" src="picturesblack/Bobcut1black.jpg" onclick="changeStyle(this,'bobcut1')" />
+                    <p>Bobcut 1</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Bobcut 2" src="picturesblack/Bobcut2black.jpg" onclick="changeStyle(this, 'bobcut2')" />
+                    <p>Bobcut 2</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Bobcut Wavy" src="picturesblack/Bobcut Wavyblack.jpg" onclick="changeStyle(this, 'bobcutwavy')" />
+                    <p>Bobcut Wavy</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Curly Bobcut 1" src="picturesblack/Curly Bubcut 1black.jpg" onclick="changeStyle(this, 'curlybobcut1')" />
+                    <p>Curly Bobcut 1</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Curly Bobcut 2" src="picturesblack/Curly 2black.jpg" onclick="changeStyle(this, 'curlybobcut2')" />
+                    <p>Curly Bobcut 2</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Combover" src="picturesblack/Comboverblack.jpg" onclick="changeStyle(this, 'combover')" />
+                    <p>Combover</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Short" src="picturesblack/Shortblack.jpg" onclick="changeStyle(this, 'short')" />
+                    <p>Short</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Pixie Cut 1" src="picturesblack/Pixie Cut 1black.jpg" onclick="changeStyle(this, 'pixiecut1')" />
+                    <p>Pixie Cut 1</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Pixie Cut 2" src="picturesblack/Pixie Cut 2black.jpg" onclick="changeStyle(this, 'pixiecut2')" />
+                    <p>Pixie Cut 2</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Updo" src="picturesblack/Updoblack.jpg" onclick="changeStyle(this, 'updo')" />
+                    <p>Updo</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Long Wavy" src="picturesblack/Long Wavyblack.jpg" onclick="changeStyle(this, 'longwavy')" />
+                    <p>Long Wavy</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Long Straight" src="picturesblack/Long Straightblack.jpg" onclick="changeStyle(this, 'longstraight')" />
+                    <p>Long Straight</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Curly 1" src="picturesblack/Curly 1black.jpg" onclick="changeStyle(this, 'curly1')" />
+                    <p>Curly 1</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Curly 2" src="picturesblack/Curly 2black.jpg" onclick="changeStyle(this, 'curly2')" />
+                    <p>Curly 2</p>
+                </div>
+                <div class="style-item">
+                    <img alt="Coily" src="picturesblack/Coilyblack.jpg" onclick="changeStyle(this, 'coily')" />
+                    <p>Coily</p>    
+                </div>
+            </div>
+            <div class="color-selector">
+                <h3>COLOR</h3>
+                <div class="colors">
+                   <!--<div class="color-item"?> <img alt="x" src="reject.png" onclick="changeColor(this, 'default')"></div>-->
+                   <div class="color-item" style="background-color: #000000;" onclick="changeColor(this, 'black')"></div>
+                    <div class="color-item" style="background-color: #e76f0c;" onclick="changeColor(this, 'brown')"></div>
+                    <div class="color-item" style="background-color: lightcyan;" onclick="changeColor(this, 'white')"></div>
+                    <div class="color-item" style="background-color:  FFF1DB;" onclick="changeColor(this, 'blonde')"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const images = {
+            "bobcut1": {
+                "black": "picturesblack/Bobcut1black.jpg",
+                "brown": "pictures/bobcut1.jpg",
+                "white": "pictureswhite/Bobcut 1white.jpg",
+                "blonde": "picturesblonde/Bobcut 1blonde.jpg"
+            },
+            "bobcut2": {
+                "black": "picturesblack/Bobcut2black.jpg",
+                "brown": "pictures/bobcut2.jpg",
+                "white": "pictureswhite/Bobcut 2white.jpg",
+                "blonde": "picturesblonde/Bobcut 2blonde.jpg"
+            },
+            "bobcutwavy": {
+                "black": "picturesblack/Bobcut wavyblack.jpg",
+                "brown": "pictures/Bobcut Wavy.jpg",
+                "white": "pictureswhite/Bobcut Wavywhite.jpg",
+                "blonde": "picturesblonde/Bobcut Wavyblonde.jpg"
+            },
+            "curlybobcut1": {
+                "black": "picturesblack/Curly Bubcut 1black.jpg",
+                "brown": "pictures/Curly Bubcut 1.jpg",
+                "white": "pictureswhite/Curly Bubcut 1white.jpg",
+                "blonde": "picturesblonde/Curly Bubcut 1blonde.jpg"
+            },
+            "curlybobcut2": {
+                "black": "picturesblack/Curly Bubcut 2black.jpg",
+                "brown": "pictures/Curly Bubcut 2.jpg",
+                "white": "pictureswhite/Curly Bubcut 2white.jpg",
+                "blonde": "picturesblonde/Curly Bubcut 2blonde.jpg"
+            },
+            "combover": {
+                "black": "picturesblack/Comboverblack.jpg",
+                "brown": "pictures/Combover.jpg",
+                "white": "pictureswhite/Comboverwhite.jpg",
+                "blonde": "picturesblonde/Comboverblonde.jpg"
+            },
+            "short": {
+                "black": "picturesblack/Shortblack.jpg",
+                "brown": "pictures/Short.jpg",
+                "white": "pictureswhite/Shortwhite.jpg",
+                "blonde": "picturesblonde/Shortblonde.jpg"
+            },
+            "pixiecut1": {
+                "black": "picturesblack/Pixie Cut 1black.jpg",
+                "brown": "pictures/Pixie Cut 1.jpg",
+                "white": "pictureswhite/Pixie Cut 1white.jpg",
+                "blonde": "picturesblonde/Pixie Cut 1blonde.jpg"
+            },
+            "pixiecut2": {
+                "black": "picturesblack/Pixie Cut 2black.jpg",
+                "brown": "pictures/Pixie Cut 2.jpg",
+                "white": "pictureswhite/Pixie Cut 2white.jpg",
+                "blonde": "picturesblonde/Pixie Cut 2blonde.jpg"
+            },
+            "updo": {
+                "black": "picturesblack/Updoblack.jpg",
+                "brown": "pictures/Updo.jpg",
+                "white": "pictureswhite/Updowhite.jpg",
+                "blonde": "picturesblonde/Updoblonde.jpg"
+            },
+            "longwavy": {
+                "black": "picturesblack/Long Wavyblack.jpg",
+                "brown": "pictures/Long Wavy.jpg",
+                "white": "pictureswhite/Long Wavywhite.jpg",
+                "blonde": "picturesblonde/Long Wavyblonde.jpg"
+            },
+            "longstraight": {
+                "black": "picturesblack/Long Straightblack.jpg",
+                "brown": "pictures/Long Straight.jpg",
+                "white": "pictureswhite/Long Straightwhite.jpg",
+                "blonde": "picturesblonde/Long Straightblonde.jpg"
+            },
+            "curly1": {
+                "black": "picturesblack/Curly 1black.jpg",
+                "brown": "pictures/Curly 1.jpg",
+                "white": "pictureswhite/Curly 1white.jpg",
+                "blonde": "picturesblonde/Curly 1blonde.jpg"
+            },
+            "curly2": {
+                "black": "picturesblack/Curly 2black.jpg",
+                "brown": "pictures/Curly 2.jpg",
+                "white": "pictureswhite/Curly 2white.jpg",
+                "blonde": "picturesblonde/Curly 2blonde.jpg"
+            },
+            "coily": {
+                "black": "picturesblack/Coilyblack.jpg",
+                "brown": "pictures/Coily.jpg",
+                "white": "pictureswhite/Coilywhite.jpg",
+                "blonde": "picturesblonde/Coilyblonde.jpg"
+            },
+        };
+
+        let currentColor = 'black';
+        function changeStyle(element, style) {
+            // Remove selected class from all style images
+            const styleImages = document.querySelectorAll('.style-item img');
+            styleImages.forEach(img => img.classList.remove('selected'));
+
+            // Add selected class to the clicked image
+            element.classList.add('selected');
+
+            // Change the main image to the clicked image's src
+            const mainImage = document.getElementById('main-image');
+            mainImage.src = images[style][currentColor];
+            mainImage.alt = style;
+        }
+
+        function changeColor(element, color) {
+            // Remove selected class from all color items
+            const colorItems = document.querySelectorAll('.color-item');
+            colorItems.forEach(item => item.classList.remove('selected'));
+
+            // Add selected class to the clicked color item
+            element.classList.add('selected');
+
+            // Change the current color
+            currentColor = color;
+
+            // Change the images to the selected color
+            const styleImages = document.querySelectorAll('.style-item ');
+            styleImages.forEach(img => {
+                const style = img.alt.toLowerCase().replace(' ', '');
+                img.src = images[style][currentColor];
+            });
+
+            // Change the main image to the selected color
+            const mainImage = document.getElementById('main-image');
+            const selectedStyle = document.querySelector('.style-item img.selected');
+            if (selectedStyle) {
+                const style = selectedStyle.alt.toLowerCase().replace(' ', '');
+                mainImage.src = images[style][currentColor];
+            }
+        }
+    </script>
+    <!--try on button-->
+    <script>
+        function changeMainImage(src, element) {
+            document.getElementById('main-image').src = src;
+            var images = document.querySelectorAll('.style-item img');
+            images.forEach(function(img) {
+                img.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        function openPopup() {
+            document.getElementById('popup').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function selectPopupImage(src) {
+            document.getElementById('main-image').src = src;
+            closePopup();
+        }
+        function selectColor(element) {
+            var options = document.querySelectorAll('.color-option');
+            options.forEach(function(option) {
+                option.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+    </script>
+</body>
+<div id="popup" class="popup">
+    <button class="popup-close" onclick="closePopup()">Close</button>
+    <p>            choose a model</p>
+    <div class="styles">
+        <div class="style-item">
+            <img src="model/first.jpg" alt="model" height="100" width="100" onclick="selectPopupImage(this.src)"/>
+            <p>model</p>
+        </div>
+    </div>
+</html>

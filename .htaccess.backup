@@ -1,0 +1,27 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Redirect specific .php files to URLs without .php
+RewriteCond %{THE_REQUEST} \s/((index|client/homepage|client/appointment|client/view-profile|client/client-inbox)\.php)[\s?] [NC]
+RewriteRule ^(index|client/homepage|client/appointment|client/view-profile|client/client-inbox)\.php$ /$1 [R=301,L]
+
+# Internally rewrite URLs without .php to their corresponding .php files
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+
+
+# Remove trailing slash (optional)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)/$ /$1 [L,R=301]
+
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?minellssalon\.site/ [NC]
+RewriteRule \.(css)$ - [F,L]
+
+<FilesMatch "\.(css|js)$">
+    RewriteEngine On
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?minellssalon\.site/ [NC]
+    RewriteRule .* - [F]
+</FilesMatch>
