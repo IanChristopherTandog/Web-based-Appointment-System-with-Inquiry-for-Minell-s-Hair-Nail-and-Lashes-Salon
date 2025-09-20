@@ -37,7 +37,7 @@ Inquiry & Contact system with social media integration.
 
 Dashboard with insights into appointments, inquiries, and customer interactions.
 
-User management with role-based access (admin vs. client).
+User management with role-based access (admin, stylist, client).
 
 Appointment monitoring with integrated calendar view.
 
